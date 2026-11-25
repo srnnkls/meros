@@ -22,7 +22,9 @@ Agent-config tools repeatedly lost user data by rewriting whole files or whole t
 
 Closest tools: mise `dot` merge entries own the keys in their source with format fidelity but keep no record, so they cannot tell another writer's edit from drift and never remove released keys. dfm keeps a per-leaf ledger with take-over and retire and writes sorted keys. microsoft/apm keeps per-file hashes and an ownership ledger. henia's config install owns units with a per-unit hash record and is the baseline this design revises.
 
-In Rust, `toml_edit` and `jsonc-parser` edit TOML and JSON/JSONC in place with comments; YAML editors that keep comments are young; RFC 8785 canonicalizers exist; no crate offers ownership of values in local files.
+The pattern keeps being rebuilt inside individual tools — managed-machine's key ledger, weaver's per-module state, rulesync's owned top-level keys, agent-hub's digest ledger, apm's per-entry fingerprints — and their reported failures are the same ones: no seed-once mode, a parse failure read as an empty document, an empty source reported as success, lost comments. None packages it for reuse.
+
+In Rust, `toml_edit` and `jsonc-parser` edit TOML and JSON/JSONC in place with comments; YAML editors that keep comments are young; RFC 8785 canonicalizers exist; no crate offers ownership of values in local files (`settings_loader` and `setty` edit config without ownership).
 
 ## Design
 
@@ -92,6 +94,6 @@ phora distributes immutable, verified artifacts and never owns parts of files. m
 - Kubernetes: Server-Side Apply and declarative `kubectl apply` docs; KEP-555; kubernetes/kubernetes #99003, #90066, #134902; Kubernetes blog posts on server-side apply (2020, 2022)
 - Terraform `lifecycle`, `import` and `removed` blocks; AWS provider `aws_iam_policy_attachment` and `aws_security_group`; Pulumi `ignoreChanges`, `retainOnDelete`; CloudFormation drift detection; Argo CD diffing and sync options; Flux; Helm 3 three-way merge; Crossplane `initProvider`
 - Augeas; libelektra; Ansible `ini_file`, `lineinfile`, `blockinfile`; Puppet `file_line`, `inifile`, `resources purge`; Salt `file.serialize`, `file.keyvalue`; chezmoi; home-manager #1800
-- Claude Code settings docs and anthropics/claude-code #29395; ruler; rulesync; ai-rulez #185; Dev Container spec; VS Code Settings Sync; mise `dot` merge entries (jdx/mise #14012, #15077); dfm (stevencarpenter/dotfiles-manager #61); microsoft/apm
+- Claude Code settings docs and anthropics/claude-code #29395; ruler; rulesync; ai-rulez #185; Dev Container spec; VS Code Settings Sync; mise `dot` merge entries (jdx/mise #14012, #15077); dfm (stevencarpenter/dotfiles-manager #61); microsoft/apm lockfile spec; qwts/managed-machine #294, #295; Web-tree/weaver #110; rulesync #3355; flyingrobots/agent-hub #38; language-operator/coding-runtime #12; mlorentedev/dotfiles #2192; `settings_loader`, `setty`
 - `toml_edit`, `serde_json`, `jsonc-parser`, YAML crates (`serde_yaml`, `serde_yml`, `yaml-rust2`, `saphyr`, `yamlpatch`), `json-patch`; RFC 6902, 7386, 8785; `serde_jcs`, `serde_json_canonicalizer`; openai/codex `config/edit.rs`, #14601; astral-sh/uv `uv-project-edit`
 - henia `internal/units/units.go`, `specs/draft/harness-config/spec.md`; taxis `docs/research.md`, `docs/merge.md`; phora `docs/template-merge-study.md`
