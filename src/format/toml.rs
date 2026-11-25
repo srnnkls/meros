@@ -30,9 +30,14 @@ pub(crate) fn parse(bytes: &[u8]) -> Result<Document, FormatError> {
     not(test),
     expect(dead_code, reason = "called by `plan`, whose body is `todo!()`")
 )]
-pub(crate) fn edit(bytes: &[u8], edits: &[Edit]) -> Result<Vec<u8>, FormatError> {
+pub(crate) fn edit<'a>(
+    bytes: &[u8],
+    edits: impl IntoIterator<Item = &'a Edit>,
+) -> Result<Vec<u8>, FormatError> {
     let mut document = document(bytes)?;
-    apply(&mut document, edits).ok_or(FormatError::UnfitEdit)?;
+    for edit in edits {
+        apply(&mut document, edit).ok_or(FormatError::UnfitEdit)?;
+    }
     Ok(document.to_string().into_bytes())
 }
 
@@ -166,18 +171,12 @@ fn commented_raw(raw: &RawString) -> bool {
     raw.as_str().is_some_and(|text| text.contains('#'))
 }
 
-fn apply(document: &mut DocumentMut, edits: &[Edit]) -> Option<()> {
-    let mut removals = Vec::new();
-    for edit in edits {
-        match edit {
-            Edit::Replace { at, value } => replace(document.as_item_mut(), at, value)?,
-            Edit::Create { at, value } => create(document.as_item_mut(), at, value)?,
-            Edit::Remove { at } => removals.push(at),
-        }
+fn apply(document: &mut DocumentMut, edit: &Edit) -> Option<()> {
+    match edit {
+        Edit::Replace { at, value } => replace(document.as_item_mut(), at, value),
+        Edit::Create { at, value } => create(document.as_item_mut(), at, value),
+        Edit::Remove { at } => remove(document, at),
     }
-    // Removing last and from the highest position down keeps every `at` as read.
-    removals.sort_unstable_by(|a, b| b.cmp(a));
-    removals.into_iter().try_for_each(|at| remove(document, at))
 }
 
 fn replace(document: &mut Item, at: &[Step], value: &Value) -> Option<()> {
@@ -656,7 +655,7 @@ mod tests {
 
     use super::{edit, parse};
     use crate::error::FormatError;
-    use crate::format::{Edit, Step};
+    use crate::format::{self, Edit, Format, Step};
     use crate::value::{Datetime, Value};
 
     fn at(keys: &[&str]) -> Vec<Step> {
@@ -915,6 +914,25 @@ id = "ruff"
                 Value::List(vec![map([("args", Value::List(vec![text("--fix")]))])]),
             )]),
         );
+    }
+
+    #[test]
+    fn edit_refuses_list_creates_off_the_original_length() {
+        let list = |index| vec![Step::Key("list".to_owned()), Step::Index(index)];
+        let missing = vec![Step::Key("missing".to_owned()), Step::Index(1)];
+        for unfit in [list(0), list(5), missing] {
+            assert_eq!(
+                format::edit(
+                    Format::Toml,
+                    b"list = [1]\n",
+                    &[Edit::Create {
+                        at: unfit,
+                        value: Value::Integer(2),
+                    }],
+                ),
+                Err(FormatError::UnfitEdit),
+            );
+        }
     }
 
     #[test]
