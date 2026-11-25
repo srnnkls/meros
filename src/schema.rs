@@ -28,12 +28,9 @@ pub struct Schema {
 }
 
 impl Schema {
-    /// Fails on an entry nested inside an atomic unit: below another entry other than through
+    /// Fails on an entry ending in `[]`, since a refined element takes no identity of its own,
+    /// and on an entry nested inside an atomic unit: below another entry other than through
     /// a `[]` refining its keyed elements or members, or below a `[]` with no such entry.
-    #[cfg_attr(
-        not(test),
-        expect(dead_code, reason = "called by `read`, whose body is `todo!()`")
-    )]
     pub(crate) fn validate(&self) -> Result<(), SchemaError> {
         for (path, _) in &self.entries {
             let segments = &path.segments;
@@ -43,6 +40,9 @@ impl Schema {
                     segments: atomic.to_vec(),
                 },
             };
+            if segments.last() == Some(&Segment::Any) {
+                return Err(SchemaError::RefinedElement { path: path.clone() });
+            }
             for (container, identity) in &self.entries {
                 let depth = container.segments.len();
                 if depth < segments.len()
@@ -148,5 +148,12 @@ mod tests {
                 }),
             );
         }
+
+        assert_eq!(
+            schema(&[("x", Identity::Members), ("x[]", Identity::Set)]).validate(),
+            Err(SchemaError::RefinedElement {
+                path: Path::parse("x[]").unwrap(),
+            }),
+        );
     }
 }

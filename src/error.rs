@@ -38,6 +38,12 @@ pub enum SchemaError {
         /// The atomic unit containing it.
         atomic: Path,
     },
+    /// A schema entry ends in `[]`, but a refined element takes no identity of its own.
+    #[error("schema entry {path} names a refined element, which takes no identity of its own")]
+    RefinedElement {
+        /// The schema entry ending in `[]`.
+        path: Path,
+    },
 }
 
 /// Why a declaration is invalid.
@@ -209,7 +215,8 @@ pub enum ApplyError {
     Changed {
         /// The changed target's file as declared.
         file: PathBuf,
-        /// The targets settled before the stop, with their new records.
+        /// The targets replaced before the stop and every target without a write, in plan
+        /// order, with their new records.
         settled: Vec<AppliedTarget>,
     },
     /// Writing a target failed; the apply stopped there.
@@ -219,7 +226,8 @@ pub enum ApplyError {
         file: PathBuf,
         /// The I/O failure.
         source: std::io::Error,
-        /// The targets settled before the stop, with their new records.
+        /// The targets replaced before the stop and every target without a write, in plan
+        /// order, with their new records.
         settled: Vec<AppliedTarget>,
     },
 }

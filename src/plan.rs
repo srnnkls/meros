@@ -94,12 +94,7 @@ pub struct TargetPlan {
     pub(crate) outcomes: BTreeMap<UnitKey, Outcome>,
     pub(crate) notices: Vec<Notice>,
     pub(crate) write: Option<Vec<u8>>,
-    #[expect(dead_code, reason = "read by `apply`, whose body is `todo!()`")]
     pub(crate) verification: Verification,
-    #[cfg_attr(
-        not(test),
-        expect(dead_code, reason = "read by `apply`, whose body is `todo!()`")
-    )]
     pub(crate) record: Record,
 }
 

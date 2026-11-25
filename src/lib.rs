@@ -3,8 +3,10 @@
 mod apply;
 mod error;
 mod format;
+mod fs;
 mod path;
 mod plan;
+mod read;
 mod record;
 mod schema;
 mod unit;
@@ -21,6 +23,7 @@ pub use error::{
 pub use format::Format;
 pub use path::Path;
 pub use plan::{Cause, Conflict, Force, Notice, Outcome, Plan, TargetPlan, ValueCause, plan};
+pub use read::read;
 pub use record::{Entry, Record, Scheme};
 pub use schema::{Identity, Schema};
 pub use unit::{Current, Declaration, Declared, Policy, Unit, UnitKey};
@@ -52,13 +55,11 @@ pub struct Snapshot {
 #[derive(Debug, Clone)]
 struct TargetSnapshot {
     target: Target,
-    #[expect(dead_code, reason = "read by `apply`, whose body is `todo!()`")]
     real: PathBuf,
     file: FileState,
 }
 
 #[derive(Debug, Clone)]
-#[expect(dead_code, reason = "built by `read`, whose body is `todo!()`")]
 enum FileState {
     Absent,
     Present {
@@ -66,16 +67,4 @@ enum FileState {
         permissions: Permissions,
         document: Document,
     },
-}
-
-/// Resolves, reads and parses every target and validates its schema and declaration.
-///
-/// # Errors
-///
-/// Fails when a target cannot be read or parsed, two targets resolve to one real file,
-/// or a schema or declaration is invalid.
-#[expect(clippy::todo, reason = "filled by MRS-011")]
-pub fn read(targets: Vec<Target>) -> Result<Snapshot, ReadError> {
-    drop(targets);
-    todo!()
 }

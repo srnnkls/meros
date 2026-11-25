@@ -35,10 +35,6 @@ pub struct Declaration {
 
 impl Declaration {
     /// Fails on a declaration the schema cannot expand into units or the format cannot hold.
-    #[cfg_attr(
-        not(test),
-        expect(dead_code, reason = "called by `read`, whose body is `todo!()`")
-    )]
     pub(crate) fn validate(&self, schema: &Schema, format: Format) -> Result<(), DeclarationError> {
         for (path, declared) in &self.entries {
             if keys(&path.segments).is_none() {
