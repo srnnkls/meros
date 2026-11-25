@@ -27,10 +27,6 @@ pub(crate) struct Document {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-#[expect(
-    dead_code,
-    reason = "built by the format adapters, which are not implemented"
-)]
 pub(crate) enum Step {
     Key(String),
     Index(usize),

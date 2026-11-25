@@ -95,7 +95,7 @@ pub(crate) struct Unprojectable;
 
 const MAX_SAFE_INTEGER: u64 = 1 << 53;
 
-fn canonical_json(value: &Value, format: Format) -> Result<String, Unprojectable> {
+pub(crate) fn canonical_json(value: &Value, format: Format) -> Result<String, Unprojectable> {
     let projection = project(value, format)?;
     #[expect(
         clippy::expect_used,
