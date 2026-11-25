@@ -10,7 +10,7 @@ use crate::unit::UnitKey;
 pub struct Record {
     /// The hash scheme the entries use.
     pub scheme: Scheme,
-    /// The owned units, sorted by key.
+    /// The recorded units, `Owned` or `Seeded`, sorted by key.
     pub entries: BTreeMap<UnitKey, Entry>,
 }
 
@@ -53,14 +53,33 @@ impl Scheme {
     }
 }
 
-/// What the tool last wrote at one unit.
+/// What the tool last wrote at one unit, under the contract the unit is held by now;
+/// serialized `{"owned": "<hex>"}` or `{"seeded": "<hex>"}`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Entry {
-    /// The canonical hash of the written value.
+#[serde(rename_all = "lowercase")]
+pub enum Entry {
+    /// An `Enforce` unit.
     #[serde(with = "hex")]
-    pub hash: [u8; 32],
-    /// Marks a `CreateOnly` write.
-    pub seeded: bool,
+    Owned {
+        /// The canonical hash of the written value.
+        hash: [u8; 32],
+    },
+    /// A `CreateOnly` unit, marking that the tool seeded it.
+    #[serde(with = "hex")]
+    Seeded {
+        /// The canonical hash of the written value.
+        hash: [u8; 32],
+    },
+}
+
+impl Entry {
+    /// The canonical hash of the written value.
+    #[must_use]
+    pub fn hash(&self) -> &[u8; 32] {
+        match self {
+            Self::Owned { hash } | Self::Seeded { hash } => hash,
+        }
+    }
 }
 
 mod hex {
@@ -107,29 +126,32 @@ mod hex {
 
 #[cfg(test)]
 mod tests {
-    use super::{Record, Scheme};
+    use super::{Entry, Record, Scheme};
 
     const HASH_A: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     const HASH_B: &str = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
 
     #[test]
-    fn record_serializes_scheme_and_sorted_hex_entries_and_reads_unknown_schemes() {
+    fn record_serializes_scheme_and_sorted_tagged_entries_and_reads_unknown_schemes() {
         let unsorted = format!(
-            r#"{{"scheme":"meros-1","entries":{{"b":{{"hash":"{HASH_B}","seeded":true}},"a":{{"hash":"{HASH_A}","seeded":false}}}}}}"#
+            r#"{{"scheme":"meros-1","entries":{{"b":{{"seeded":"{HASH_B}"}},"a":{{"owned":"{HASH_A}"}}}}}}"#
         );
         let record: Record = serde_json::from_str(&unsorted).unwrap();
         assert_eq!(record.scheme, Scheme::Meros1);
-        let first = record.entries.values().next().unwrap();
-        assert_eq!(
-            first.hash[..8],
-            [0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]
-        );
-        assert!(!first.seeded);
+        let kinds: Vec<(&str, &str, u8)> = record
+            .entries
+            .iter()
+            .map(|(key, entry)| match entry {
+                Entry::Owned { hash } => (key.as_str(), "owned", hash[0]),
+                Entry::Seeded { hash } => (key.as_str(), "seeded", hash[0]),
+            })
+            .collect();
+        assert_eq!(kinds, [("a", "owned", 0x01), ("b", "seeded", 0xfe)]);
 
         assert_eq!(
             serde_json::to_string(&record).unwrap(),
             format!(
-                r#"{{"scheme":"meros-1","entries":{{"a":{{"hash":"{HASH_A}","seeded":false}},"b":{{"hash":"{HASH_B}","seeded":true}}}}}}"#
+                r#"{{"scheme":"meros-1","entries":{{"a":{{"owned":"{HASH_A}"}},"b":{{"seeded":"{HASH_B}"}}}}}}"#
             ),
         );
 
@@ -138,12 +160,11 @@ mod tests {
             assert_eq!(record.scheme, Scheme::Unknown, "{unknown}");
         }
 
-        let long_hash = format!(
-            r#"{{"scheme":"meros-2","entries":{{"a":{{"hash":"{HASH_A}{HASH_B}","seeded":false}}}}}}"#
-        );
+        let long_hash =
+            format!(r#"{{"scheme":"meros-2","entries":{{"a":{{"owned":"{HASH_A}{HASH_B}"}}}}}}"#);
         for unknown in [
             r#"{"scheme":"meros-2"}"#,
-            r#"{"scheme":"meros-2","entries":{"a":{"hash":"00","seeded":false}}}"#,
+            r#"{"scheme":"meros-2","entries":{"a":{"seeded":"00"}}}"#,
             r#"{"scheme":"meros-2","entries":{"a":{"digest":"00"}}}"#,
             &long_hash,
         ] {

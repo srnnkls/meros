@@ -126,10 +126,6 @@ pub enum Current {
 
 /// Derives every unit the schema addresses in the document or the declaration, each with
 /// what the document holds there and its declared value.
-#[cfg_attr(
-    not(test),
-    expect(dead_code, reason = "called by `plan`, whose body is `todo!()`")
-)]
 pub(crate) fn derive(
     schema: &Schema,
     declaration: &Declaration,
@@ -767,14 +763,14 @@ fn absent(container: &Held<'_>) -> Current {
 }
 
 /// A set element's typed canonical JSON; `None` for compound or unprojectable values.
-fn element_key(value: &Value, format: Format) -> Option<String> {
+pub(crate) fn element_key(value: &Value, format: Format) -> Option<String> {
     if matches!(value, Value::Map(_) | Value::List(_)) {
         return None;
     }
     canonical_json(value, format).ok()
 }
 
-fn identify(element: &Value, field: &str) -> Option<Literal> {
+pub(crate) fn identify(element: &Value, field: &str) -> Option<Literal> {
     match element {
         Value::Map(members) => literal(members.get(field)?),
         _ => None,

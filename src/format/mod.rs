@@ -20,13 +20,9 @@ pub enum Format {
 
 /// A parsed target document, the compound values holding a comment inside them, and the
 /// map keys appearing more than once, which `value` holds only once.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Document {
     pub(crate) value: Value,
-    #[cfg_attr(
-        not(test),
-        expect(dead_code, reason = "read by `plan`, whose body is `todo!()`")
-    )]
     pub(crate) commented: BTreeSet<Vec<Step>>,
     pub(crate) duplicated: BTreeSet<Vec<Step>>,
 }
@@ -41,20 +37,12 @@ pub(crate) enum Step {
 /// A created list element sits at the list's original length, so creates into one list
 /// append in edit order.
 #[derive(Debug)]
-#[cfg_attr(
-    not(test),
-    expect(dead_code, reason = "built by `plan`, whose body is `todo!()`")
-)]
 pub(crate) enum Edit {
     Replace { at: Vec<Step>, value: Value },
     Create { at: Vec<Step>, value: Value },
     Remove { at: Vec<Step> },
 }
 
-#[cfg_attr(
-    not(test),
-    expect(dead_code, reason = "called by `read`, whose body is `todo!()`")
-)]
 pub(crate) fn parse(format: Format, bytes: &[u8]) -> Result<Document, FormatError> {
     match format {
         Format::Toml => toml::parse(bytes),
@@ -63,12 +51,7 @@ pub(crate) fn parse(format: Format, bytes: &[u8]) -> Result<Document, FormatErro
     }
 }
 
-/// Applies `edits` in an order that keeps every `at` as read: changes in the given order,
-/// then removals from the highest position down.
-#[cfg_attr(
-    not(test),
-    expect(dead_code, reason = "called by `plan`, whose body is `todo!()`")
-)]
+/// Applies `edits` in their `ordered` order.
 pub(crate) fn edit(format: Format, bytes: &[u8], edits: &[Edit]) -> Result<Vec<u8>, FormatError> {
     let read = parse(format, bytes)?.value;
     let creates_fit = edits.iter().all(|edit| match edit {
@@ -78,6 +61,17 @@ pub(crate) fn edit(format: Format, bytes: &[u8], edits: &[Edit]) -> Result<Vec<u
     if !creates_fit {
         return Err(FormatError::UnfitEdit);
     }
+    let ordered = ordered(edits);
+    match format {
+        Format::Toml => toml::edit(bytes, ordered),
+        Format::Json => json::edit(bytes, ordered),
+        Format::Yaml => yaml::edit(bytes, ordered),
+    }
+}
+
+/// `edits` in the order that keeps every `at` as read: changes in the given order, then
+/// removals from the highest position down.
+pub(crate) fn ordered(edits: &[Edit]) -> Vec<&Edit> {
     let mut removals: Vec<(&Vec<Step>, &Edit)> = edits
         .iter()
         .filter_map(|edit| match edit {
@@ -86,16 +80,11 @@ pub(crate) fn edit(format: Format, bytes: &[u8], edits: &[Edit]) -> Result<Vec<u
         })
         .collect();
     removals.sort_unstable_by(|(a, _), (b, _)| b.cmp(a));
-    let ordered: Vec<&Edit> = edits
+    edits
         .iter()
         .filter(|edit| !matches!(edit, Edit::Remove { .. }))
         .chain(removals.into_iter().map(|(_, edit)| edit))
-        .collect();
-    match format {
-        Format::Toml => toml::edit(bytes, ordered),
-        Format::Json => json::edit(bytes, ordered),
-        Format::Yaml => yaml::edit(bytes, ordered),
-    }
+        .collect()
 }
 
 /// Whether a create at `at` lands at the end of every list `read` lacks it in: list steps

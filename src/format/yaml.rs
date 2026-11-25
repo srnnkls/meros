@@ -10,10 +10,6 @@ use crate::value::Value;
 
 /// The document as a value; comments and duplicate keys make it unsupported, so it
 /// marks neither.
-#[cfg_attr(
-    not(test),
-    expect(dead_code, reason = "called by `read`, whose body is `todo!()`")
-)]
 pub(crate) fn parse(bytes: &[u8]) -> Result<Document, FormatError> {
     Ok(Document {
         value: read(bytes)?.into_value(),
@@ -22,10 +18,6 @@ pub(crate) fn parse(bytes: &[u8]) -> Result<Document, FormatError> {
     })
 }
 
-#[cfg_attr(
-    not(test),
-    expect(dead_code, reason = "called by `plan`, whose body is `todo!()`")
-)]
 pub(crate) fn edit<'a>(
     bytes: &[u8],
     edits: impl IntoIterator<Item = &'a Edit>,

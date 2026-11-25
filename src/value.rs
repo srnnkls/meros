@@ -104,10 +104,6 @@ pub(crate) fn canonical_json(value: &Value, format: Format) -> Result<String, Un
     Ok(serde_json_canonicalizer::to_string(&projection).expect("projection serializes"))
 }
 
-#[cfg_attr(
-    not(test),
-    expect(dead_code, reason = "read by unit derivation, whose body is `todo!()`")
-)]
 pub(crate) fn canonical_hash(value: &Value, format: Format) -> Result<[u8; 32], Unprojectable> {
     Ok(Sha256::digest(canonical_json(value, format)?).into())
 }

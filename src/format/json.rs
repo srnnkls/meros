@@ -11,10 +11,6 @@ use super::{Document, Edit, Step};
 use crate::error::FormatError;
 use crate::value::Value;
 
-#[cfg_attr(
-    not(test),
-    expect(dead_code, reason = "called by `read`, whose body is `todo!()`")
-)]
 pub(crate) fn parse(bytes: &[u8]) -> Result<Document, FormatError> {
     let mut reader = Reader::default();
     let value = match document(utf8(bytes)?)?.value() {
@@ -28,10 +24,6 @@ pub(crate) fn parse(bytes: &[u8]) -> Result<Document, FormatError> {
     })
 }
 
-#[cfg_attr(
-    not(test),
-    expect(dead_code, reason = "called by `plan`, whose body is `todo!()`")
-)]
 pub(crate) fn edit<'a>(
     bytes: &[u8],
     edits: impl IntoIterator<Item = &'a Edit>,

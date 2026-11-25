@@ -46,23 +46,18 @@ pub struct Target {
 /// Targets as read, resolved and validated.
 #[derive(Debug)]
 pub struct Snapshot {
-    #[expect(dead_code, reason = "read by `plan`, whose body is `todo!()`")]
     targets: Vec<TargetSnapshot>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct TargetSnapshot {
     target: Target,
     #[expect(dead_code, reason = "read by `apply`, whose body is `todo!()`")]
     real: PathBuf,
-    #[expect(
-        dead_code,
-        reason = "read by `plan` and `apply`, whose bodies are `todo!()`"
-    )]
     file: FileState,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[expect(dead_code, reason = "built by `read`, whose body is `todo!()`")]
 enum FileState {
     Absent,
