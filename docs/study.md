@@ -38,7 +38,7 @@ Inputs per file: the document, the declared units (path → desired value, polic
 6. Undeclared: mine → removed; recorded but not mine → entry dropped, file untouched, reported released.
 7. Identity per path: `atomic` (default), `set` (scalars by value), `keyed(field)` (list elements by a unique field), map members by name.
 8. The whole apply is planned before any write: new bytes are produced and re-parsed, and anything beyond the planned units aborts the apply, as does any conflict. Edits are in place and keep surrounding comments; a comment inside an owned compound value conflicts only on a real replace or removal. Writes refuse if the file changed since it was read; record entries are hashed from the written bytes.
-9. Hashes are versioned RFC 8785 over the parsed value; TOML and YAML distinguish integer, float and datetime; JSON numbers compare by value; integers beyond ±2^53 are refused.
+9. Hashes are versioned RFC 8785 over the parsed value; TOML and YAML distinguish integer and float, TOML also its datetime kinds (YAML 1.2 timestamps are strings); JSON numbers compare by value; integers beyond ±2^53 are refused.
 10. A declaration that fails to load aborts the apply.
 11. Force applies to one apply's conflicts and is reported per conflict with its cause.
 
