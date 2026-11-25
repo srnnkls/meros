@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::path::Path;
 use crate::value::Value;
 
@@ -39,7 +41,8 @@ impl FromIterator<(Path, Value, Policy)> for Declaration {
 
 /// A unit's canonical address: its path, plus `[field=literal]` for keyed elements
 /// or `[=<typed canonical JSON>]` for set elements.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct UnitKey(String);
 
 impl UnitKey {

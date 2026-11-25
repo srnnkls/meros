@@ -31,7 +31,7 @@ pub enum PathError {
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum SchemaError {
     /// A schema entry lies inside a path that is itself one atomic unit.
-    #[error("schema entry {path:?} lies inside the atomic unit {atomic:?}")]
+    #[error("schema entry {path} lies inside the atomic unit {atomic}")]
     NestedInAtomic {
         /// The nested schema entry.
         path: Path,
@@ -44,7 +44,7 @@ pub enum SchemaError {
 #[derive(Debug, Error, PartialEq)]
 pub enum DeclarationError {
     /// Two declared paths address overlapping parts of the document.
-    #[error("declared paths {path:?} and {other:?} overlap")]
+    #[error("declared paths {path} and {other} overlap")]
     Overlap {
         /// One of the overlapping paths.
         path: Path,
@@ -52,7 +52,7 @@ pub enum DeclarationError {
         other: Path,
     },
     /// A declared container holds two elements or members with one identity.
-    #[error("declaration {path:?} holds the identity `{identity}` twice")]
+    #[error("declaration {path} holds the identity `{identity}` twice")]
     DuplicateIdentity {
         /// The declared container.
         path: Path,
@@ -60,7 +60,7 @@ pub enum DeclarationError {
         identity: String,
     },
     /// A declared value is not the kind its identity takes.
-    #[error("declaration {path:?} does not fit its identity {identity:?}")]
+    #[error("declaration {path} does not fit its identity {identity}")]
     KindMismatch {
         /// The declared path.
         path: Path,
@@ -68,7 +68,7 @@ pub enum DeclarationError {
         identity: Identity,
     },
     /// A declared keyed element lacks its key field.
-    #[error("declaration {path:?} has an element without its key field `{field}`")]
+    #[error("declaration {path} has an element without its key field `{field}`")]
     MissingKeyField {
         /// The declared keyed container.
         path: Path,
@@ -76,19 +76,19 @@ pub enum DeclarationError {
         field: String,
     },
     /// A declared path uses a `[field=literal]` selector.
-    #[error("declaration {path:?} uses a selector")]
+    #[error("declaration {path} uses a selector")]
     Selector {
         /// The declared path.
         path: Path,
     },
     /// A declared value cannot be encoded in the target's format.
-    #[error("declaration {path:?} holds a value its format cannot encode")]
+    #[error("declaration {path} holds a value its format cannot encode")]
     Unencodable {
         /// The declared path.
         path: Path,
     },
     /// A declared value has no canonical projection.
-    #[error("declaration {path:?} holds NaN, an infinity or an integer beyond 2^53")]
+    #[error("declaration {path} holds NaN, an infinity or an integer beyond 2^53")]
     Unprojectable {
         /// The declared path.
         path: Path,
