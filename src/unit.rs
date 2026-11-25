@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 
 use crate::error::DeclarationError;
-use crate::format::{Document, Format, Step};
+use crate::format::{Document, Format, Step, encodable};
 use crate::path::{Literal, Path, Segment};
 use crate::schema::{Identity, Schema};
 use crate::value::{Value, canonical_hash, canonical_json};
@@ -44,7 +44,7 @@ impl Declaration {
             if keys(&path.segments).is_none() {
                 return Err(DeclarationError::Selector { path: path.clone() });
             }
-            if !encodable(&declared.value, format) {
+            if !encodable(format, &declared.value) {
                 return Err(DeclarationError::Unencodable { path: path.clone() });
             }
             if canonical_hash(&declared.value, format).is_err() {
@@ -787,16 +787,6 @@ fn literal(value: &Value) -> Option<Literal> {
         Value::Integer(integer) => Some(Literal::Integer(*integer)),
         Value::Boolean(boolean) => Some(Literal::Boolean(*boolean)),
         _ => None,
-    }
-}
-
-fn encodable(value: &Value, format: Format) -> bool {
-    match value {
-        Value::Map(members) => members.values().all(|member| encodable(member, format)),
-        Value::List(elements) => elements.iter().all(|element| encodable(element, format)),
-        Value::Null => format != Format::Toml,
-        Value::Datetime(_) => format == Format::Toml,
-        _ => true,
     }
 }
 

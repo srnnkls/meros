@@ -104,6 +104,9 @@ pub enum FormatError {
         /// The parser's description of the error.
         message: String,
     },
+    /// An edit names a position or value the document cannot take.
+    #[error("the document cannot take the edit")]
+    UnfitEdit,
     /// The YAML document uses a feature meros cannot edit safely.
     #[error("unsupported YAML: {0:?}")]
     UnsupportedYaml(YamlFeature),
