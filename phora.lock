@@ -1,0 +1,17 @@
+version = 1
+
+[[sources]]
+name = "agent-bot-machine"
+git = "https://github.com/true-line/agent-bot-machine.git"
+resolved = "main"
+commit = "a656f059848005066d620db364f7572d1801bff0"
+digest = "blake3:60ec6b1bd728f407e457bd7257e968995848a396236f9a95adffcb8c51793d67"
+config_digest = "blake3:16e82de3344f862da7a8f965e856c92df6933ac9f99b301372570a9404478593"
+
+[[sources]]
+name = "apm"
+git = "https://github.com/microsoft/apm.git"
+resolved = "main"
+commit = "495a54740cf6ee93d10e462516086fcbf1cab7af"
+digest = "blake3:8686833c0e5cebaafd601bab6a6338f34a96222fd3e724c74bd9a3d2f2fd9b10"
+config_digest = "blake3:0613e318090a8e27aacb26cdbd1e8fdeb0f0f0c58129ba71fe11ff4a061d3944"

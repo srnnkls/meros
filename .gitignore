@@ -3,3 +3,6 @@
 # Scope-tracking working notes are local-only, never tracked.
 /scopes/
 .tropos/
+
+# Reference snapshots managed by phora (phora.toml, phora.lock).
+/resources/

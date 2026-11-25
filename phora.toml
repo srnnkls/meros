@@ -1,0 +1,17 @@
+[sources.apm]
+repo = "microsoft/apm"
+branch = "main"
+include = ["/docs/", "/src/", "/README.md", "/CONFORMANCE.md", "/PRINCIPLES.md"]
+
+[sources.agent-bot-machine]
+repo = "true-line/agent-bot-machine"
+branch = "main"
+include = ["/docs/", "/cmd/", "/internal/", "/README.md", "/AGENTS.md"]
+
+[targets.resources]
+path = "resources"
+layout = "by-source"
+
+[targets.resources.sources]
+apm = { template = false, collapse = false }
+agent-bot-machine = { template = false, collapse = false }
