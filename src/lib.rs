@@ -79,6 +79,7 @@ enum FileState {
 ///
 /// Fails when a target cannot be read or parsed, two targets resolve to one real file,
 /// or a schema or declaration is invalid.
+#[expect(clippy::todo, reason = "filled by MRS-011")]
 pub fn read(targets: Vec<Target>) -> Result<Snapshot, ReadError> {
     drop(targets);
     todo!()

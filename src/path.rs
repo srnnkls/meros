@@ -32,6 +32,7 @@ impl Path {
     /// # Errors
     ///
     /// Fails when `input` is not a valid taxis path.
+    #[expect(clippy::todo, reason = "filled by MRS-004")]
     pub fn parse(input: &str) -> Result<Self, PathError> {
         let _ = input;
         todo!()

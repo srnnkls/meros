@@ -157,6 +157,7 @@ impl TargetPlan {
 /// # Errors
 ///
 /// Fails when an adapter cannot produce a target's new document.
+#[expect(clippy::todo, reason = "filled by MRS-007")]
 pub fn plan(snapshot: &Snapshot, force: Force) -> Result<Plan, PlanError> {
     let _ = (snapshot, force);
     todo!()

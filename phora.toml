@@ -8,6 +8,16 @@ repo = "true-line/agent-bot-machine"
 branch = "main"
 include = ["/docs/", "/cmd/", "/internal/", "/README.md", "/AGENTS.md"]
 
+[sources.loqui-common]
+repo = "srnnkls/loqui"
+root = "blueprints/common"
+branch = "main"
+
+[sources.loqui-rust]
+repo = "srnnkls/loqui"
+root = "blueprints/rust"
+branch = "main"
+
 [targets.resources]
 path = "resources"
 layout = "by-source"
@@ -15,3 +25,25 @@ layout = "by-source"
 [targets.resources.sources]
 apm = { template = false, collapse = false }
 agent-bot-machine = { template = false, collapse = false }
+
+[targets.loqui]
+path = "."
+
+[targets.loqui.sources.loqui-common]
+collapse = false
+take = [
+  { "gate.pkl" = ".loqui/hk/gate.pkl" },
+  { "mise.toml" = ".config/mise/conf.d/loqui.toml" },
+]
+
+[targets.loqui.sources.loqui-rust]
+collapse = false
+take = [
+  { "hk.pkl" = ".loqui/hk/rust.pkl" },
+  { "lints.toml" = ".loqui/rust/lints.toml" },
+  { "rustfmt.toml" = "rustfmt.toml" },
+  { "clippy.toml" = "clippy.toml" },
+]
+
+[targets.loqui.hooks]
+on_change = ["mise run loqui merge-lints"]

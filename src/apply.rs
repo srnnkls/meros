@@ -33,6 +33,7 @@ pub struct AppliedTarget {
 /// Refuses a plan with an unforced conflict or a failed verification before any write;
 /// stops at the first target found changed or failing to write, carrying the records of
 /// the targets already settled.
+#[expect(clippy::todo, reason = "filled by MRS-011")]
 pub fn apply(plan: Plan) -> Result<Applied, ApplyError> {
     drop(plan);
     todo!()

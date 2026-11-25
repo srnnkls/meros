@@ -1,3 +1,5 @@
+//! Public API surface of meros.
+
 use meros::{
     Applied, ApplyError, Conflict, Declaration, Force, Format, Identity, Notice, Outcome, Path,
     PathError, Plan, PlanError, Policy, ReadError, Record, Schema, Snapshot, Target, Unit, UnitKey,

@@ -1,2 +1,2 @@
-[tools]
-"github:srnnkls/phora" = "0.5.0"
+[tasks.loqui]
+file = "git::https://github.com/srnnkls/loqui.git//bin/loqui?ref=main"

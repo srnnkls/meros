@@ -1,0 +1,9 @@
+amends "package://github.com/jdx/hk/releases/download/v2.13.0/hk@2.13.0#/Config.pkl"
+import ".loqui/hk/gate.pkl"
+import ".loqui/hk/rust.pkl"
+
+hooks = gate.standard(
+  new Mapping<String, Step> { ...rust.fast },
+  new Mapping<String, Step> { ...rust.heavy },
+  new Mapping<String, Step> { ...rust.fixers }
+)
