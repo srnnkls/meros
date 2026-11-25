@@ -19,7 +19,7 @@ pub use error::{
     YamlFeature,
 };
 pub use format::Format;
-pub use path::{Literal, Path, Segment};
+pub use path::Path;
 pub use plan::{Cause, Conflict, Force, Notice, Outcome, Plan, TargetPlan, ValueCause, plan};
 pub use record::{Entry, Record, Scheme};
 pub use schema::{Identity, Schema};
@@ -28,12 +28,18 @@ pub use value::{Datetime, DatetimeKind, Value};
 
 use format::Document;
 
+/// One file to manage.
 #[derive(Debug, Clone)]
 pub struct Target {
+    /// The file as the caller names it; a symlink is resolved when read.
     pub file: PathBuf,
+    /// How the file is parsed and edited.
     pub format: Format,
+    /// Identity per container path.
     pub schema: Schema,
+    /// The desired units.
     pub declaration: Declaration,
+    /// What the tool last wrote in the file.
     pub record: Record,
 }
 

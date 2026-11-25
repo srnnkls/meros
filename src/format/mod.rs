@@ -2,11 +2,14 @@ use std::collections::BTreeSet;
 
 use crate::value::Value;
 
+/// A target file's format.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Format {
+    /// TOML.
     Toml,
     /// JSON and JSONC.
     Json,
+    /// YAML 1.2, core schema.
     Yaml,
 }
 

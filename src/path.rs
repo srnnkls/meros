@@ -7,7 +7,8 @@ pub struct Path {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Segment {
+#[expect(dead_code, reason = "built by `Path::parse`, whose body is `todo!()`")]
+pub(crate) enum Segment {
     Key(String),
     Select {
         field: String,
@@ -18,7 +19,8 @@ pub enum Segment {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Literal {
+#[expect(dead_code, reason = "built by `Path::parse`, whose body is `todo!()`")]
+pub(crate) enum Literal {
     String(String),
     Integer(i64),
     Boolean(bool),

@@ -3,10 +3,13 @@ use crate::path::Path;
 /// How a container path's children are identified.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Identity {
+    /// The whole value is one unit.
     Atomic,
+    /// Each scalar element of a list is a unit.
     Set,
-    /// Elements identified by the named field.
+    /// Each map element of a list is a unit, identified by the named field.
     Keyed(String),
+    /// Each member of a map is a unit.
     Members,
 }
 

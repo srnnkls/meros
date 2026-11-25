@@ -5,8 +5,10 @@ use crate::record::Record;
 use crate::unit::UnitKey;
 use crate::{Snapshot, TargetSnapshot};
 
+/// Whether planning overrides value conflicts.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum Force {
+    /// Value conflicts stay conflicts.
     #[default]
     Off,
     /// Value conflicts are written and reported as `Outcome::Forced`.
@@ -16,40 +18,62 @@ pub enum Force {
 /// A conflict cause that force overrides.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ValueCause {
+    /// The unit holds a value that is not mine and differs from the declared one.
     ForeignEdit,
+    /// Another writer deleted a recorded value.
     ForeignDeletion,
+    /// An owned compound value to replace or remove holds a comment.
     InnerComment,
 }
 
+/// Why a unit cannot be written.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Cause {
+    /// A value conflict, which force overrides.
     Value(ValueCause),
+    /// Several elements or members share the unit's identity.
     Duplicate,
+    /// A parent holds a non-table value.
     ScalarParent,
+    /// The container is not the kind the unit's identity needs.
     WrongContainerKind,
+    /// The current value has no canonical projection.
     Unhashable,
 }
 
+/// A unit that cannot be written, and why.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Conflict {
+    /// The conflicting unit.
     pub unit: UnitKey,
+    /// Why it conflicts.
     pub cause: Cause,
 }
 
+/// What a plan does to one unit.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Outcome {
+    /// The unit's value stays as it is; its record entry is kept only while
+    /// the unit is mine or seeded.
     Unchanged,
+    /// The unit is written where nothing was.
     Created,
+    /// The unit's owned value is replaced.
     Replaced,
+    /// The unit's owned value is removed.
     Removed,
     /// The record entry is dropped; the file keeps the value.
     Released,
+    /// A value conflict written under force.
     Forced(ValueCause),
+    /// The unit is not written.
     Conflict(Conflict),
 }
 
+/// A non-blocking report on a target.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Notice {
+    /// The record's scheme is missing or unknown, so it counts as no record.
     RecordSchemeUnknown,
 }
 
@@ -121,6 +145,7 @@ impl TargetPlan {
         &self.outcomes
     }
 
+    /// The target's non-blocking reports.
     #[must_use]
     pub fn notices(&self) -> &[Notice] {
         &self.notices
