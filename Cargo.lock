@@ -3,6 +3,12 @@
 version = 4
 
 [[package]]
+name = "arraydeque"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d902e3d592a523def97af8f317b08ce16b7ab854c1985a0c671e6f15cebc236"
+
+[[package]]
 name = "block-buffer"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -112,6 +118,7 @@ name = "meros"
 version = "0.1.0"
 dependencies = [
  "jsonc-parser",
+ "saphyr-parser",
  "serde",
  "serde_json",
  "serde_json_canonicalizer",
@@ -143,6 +150,16 @@ name = "ryu-js"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f232fd0249f55adbe7f15bee58bbbd3d40708000b84e6482066d2ba599e08a9"
+
+[[package]]
+name = "saphyr-parser"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8af5472a0fd13242ab1e30a2ae6290d5b875a095dd17b21c26d01d556cf766bd"
+dependencies = [
+ "arraydeque",
+ "thiserror",
+]
 
 [[package]]
 name = "serde"

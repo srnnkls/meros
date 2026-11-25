@@ -1,5 +1,6 @@
 mod json;
 mod toml;
+mod yaml;
 
 use std::collections::BTreeSet;
 
@@ -54,12 +55,11 @@ pub(crate) enum Edit {
     not(test),
     expect(dead_code, reason = "called by `read`, whose body is `todo!()`")
 )]
-#[expect(clippy::todo, reason = "filled by MRS-010")]
 pub(crate) fn parse(format: Format, bytes: &[u8]) -> Result<Document, FormatError> {
     match format {
         Format::Toml => toml::parse(bytes),
         Format::Json => json::parse(bytes),
-        Format::Yaml => todo!(),
+        Format::Yaml => yaml::parse(bytes),
     }
 }
 
@@ -69,7 +69,6 @@ pub(crate) fn parse(format: Format, bytes: &[u8]) -> Result<Document, FormatErro
     not(test),
     expect(dead_code, reason = "called by `plan`, whose body is `todo!()`")
 )]
-#[expect(clippy::todo, reason = "filled by MRS-010")]
 pub(crate) fn edit(format: Format, bytes: &[u8], edits: &[Edit]) -> Result<Vec<u8>, FormatError> {
     let read = parse(format, bytes)?.value;
     let creates_fit = edits.iter().all(|edit| match edit {
@@ -95,7 +94,7 @@ pub(crate) fn edit(format: Format, bytes: &[u8], edits: &[Edit]) -> Result<Vec<u
     match format {
         Format::Toml => toml::edit(bytes, ordered),
         Format::Json => json::edit(bytes, ordered),
-        Format::Yaml => todo!(),
+        Format::Yaml => yaml::edit(bytes, ordered),
     }
 }
 
@@ -129,6 +128,7 @@ fn appends(read: &Value, at: &[Step]) -> bool {
 pub(crate) fn encodable(format: Format, value: &Value) -> bool {
     match format {
         Format::Toml => toml::encodable(value),
-        Format::Json | Format::Yaml => json::encodable(value),
+        Format::Json => json::encodable(value),
+        Format::Yaml => yaml::encodable(value),
     }
 }
