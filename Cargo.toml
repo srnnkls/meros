@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.96"
 license = "MIT"
+description = "Own declared values inside structured files that others also write"
+repository = "https://github.com/srnnkls/meros"
 
 [dependencies]
 jsonc-parser = { version = "0.33", features = ["cst"] }
