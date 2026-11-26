@@ -1,4 +1,4 @@
-//! Ownership of declared values inside structured files that other writers share.
+#![doc = include_str!("../README.md")]
 
 mod apply;
 mod error;

@@ -2,8 +2,11 @@ amends "package://github.com/jdx/hk/releases/download/v2.13.0/hk@2.13.0#/Config.
 import ".loqui/hk/gate.pkl"
 import ".loqui/hk/rust.pkl"
 
+// README.md is the crate documentation: its doctest and doc lints run with these steps.
+local crateDocs = List("README.md")
+
 hooks = gate.standard(
-  new Mapping<String, Step> { ...rust.fast },
-  new Mapping<String, Step> { ...rust.heavy },
+  (rust.fast) { ["rust-clippy"] { glob = super.glob + crateDocs } },
+  (rust.heavy) { ["rust-test"] { glob = super.glob + crateDocs } },
   new Mapping<String, Step> { ...rust.fixers }
 )
