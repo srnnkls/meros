@@ -11,12 +11,17 @@ include = ["/docs/", "/cmd/", "/internal/", "/README.md", "/AGENTS.md"]
 [sources.loqui-common]
 repo = "srnnkls/loqui"
 root = "blueprints/common"
-branch = "main"
+rev = "9fb7a325a18dece6ddc1dec66f00b021233749b6"
 
 [sources.loqui-rust]
 repo = "srnnkls/loqui"
 root = "blueprints/rust"
-branch = "main"
+rev = "9fb7a325a18dece6ddc1dec66f00b021233749b6"
+
+[sources.loqui-rust-release]
+repo = "srnnkls/loqui"
+root = "blueprints/rust-release"
+rev = "9fb7a325a18dece6ddc1dec66f00b021233749b6"
 
 [targets.resources]
 path = "resources"
@@ -43,6 +48,15 @@ take = [
   { "lints.toml" = ".loqui/rust/lints.toml" },
   { "rustfmt.toml" = "rustfmt.toml" },
   { "clippy.toml" = "clippy.toml" },
+]
+
+[targets.loqui.sources.loqui-rust-release]
+collapse = false
+take = [
+  { "hk.pkl" = ".loqui/hk/rust-release.pkl" },
+  { "cliff.toml" = ".loqui/rust-release/cliff.toml" },
+  { "release-plz.yml" = ".github/workflows/release-plz.yml" },
+  { "mise.toml" = ".config/mise/conf.d/loqui-rust-release.toml" },
 ]
 
 [targets.loqui.hooks]
